@@ -3,7 +3,7 @@
 <h1>Categories</h1>
 <ul>
     {% for cat in categories %}
-    {{ cat.name }}
+    <a href="categories/{{ cat.id }}">{{ cat.name }}</a>
     {% endfor %}
 </ul>
 {% endblock %}
