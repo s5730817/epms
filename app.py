@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for
 import datetime
 from models import Part, User, Category
-from models.seed_db import seed_db, user_stock_test
+from models.seed_db import seed_db
 from extensions import db
 
 app =  Flask(__name__, template_folder="templates")
@@ -30,9 +30,12 @@ def check_item(part_id):
 def login():
     return render_template("login.html")
 
+@app.route("/home/<int:user_id>")
+def display_user(user_id):
+    user = User.query.get_or_404(user_id)
+    return render_template("display_user.html", user=user)
 
 
 if __name__ == "__main__":    
     seed_db(app=app)
-    #user_stock_test(app=app)
     app.run(debug=True)
