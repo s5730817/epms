@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for
 import datetime
-from models import Part, User, Category
+from models import *
 from models.seed_db import seed_db
 from extensions import db
 
@@ -33,7 +33,8 @@ def login():
 @app.route("/home/<int:user_id>")
 def display_user(user_id):
     user = User.query.get_or_404(user_id)
-    return render_template("display_user.html", user=user)
+    user_stock = Part.query.filter(Part.id.in_([stock_item.part_id for stock_item in UserStock.query.filter_by(user_id=user_id).all()])).all()    
+    return render_template("display_user.html", user=user, user_stock=user_stock)
 
 
 if __name__ == "__main__":    

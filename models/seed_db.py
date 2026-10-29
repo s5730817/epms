@@ -12,6 +12,8 @@ Creates:
 - Parts assigned to categories
 - Users
 - User stock entries with random quantities
+
+AI-generated
 """
 
 categories = [
@@ -94,11 +96,3 @@ def seed_db(app: Flask):
         print(f"Created {len(part_objects)} parts")
         print(f"Created {len(user_objects)} users")
         print(f"Created {UserStock.query.count()} stock entries")
-
-
-if __name__ == "__main__":
-    # Import your Flask app here if needed.
-    # Example:
-    # from app import app
-    # seed_db(app)
-    pass
