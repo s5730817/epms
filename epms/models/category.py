@@ -1,4 +1,4 @@
-from extensions import db
+from epms.extensions import db
 
 class Category(db.Model):
     __tablename__ = "categories"

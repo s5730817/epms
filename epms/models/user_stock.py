@@ -1,5 +1,5 @@
-from extensions import db
-from models import *
+from epms.extensions import db
+from epms.models import *
 from sqlalchemy import ForeignKey
 
 class UserStock(db.Model):
