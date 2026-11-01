@@ -21,13 +21,12 @@ def create_app(config_file=config):
     ### Webdev is an absolute from of a headscrather
     ### Doesn't want to work bc "extensions doesn't exist"
     ### TO FIX
-    """
+    
     @app.cli.command("seed")
     def seed_command():
         with app.app_context():
-            from models.seed_db import seed_db
+            from .models import seed_db
             seed_db(db=db)   
-    """
     return app
 
 

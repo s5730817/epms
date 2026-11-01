@@ -13,21 +13,24 @@ Creates:
 AI-generated
 """
 
-categories = [
-    "Connectors",
-    "Sensors",
-    "Power",
-    "Protection",
-    "ICs",
-    "Diodes",
-    "Resistors",
-]
 
-usernames = ["Alice", "Bob", "Simon", "Henry", "Andrew", "Steve"]
-
-parts_per_category = 20
 
 def seed_db(db):
+
+    categories = [
+        "Connectors",
+        "Sensors",
+        "Power",
+        "Protection",
+        "ICs",
+        "Diodes",
+        "Resistors",
+    ]
+
+    usernames = ["Alice", "Bob", "Simon", "Henry", "Andrew", "Steve"]
+
+    parts_per_category = 20
+
     # WARNING: This deletes all existing database data.
     db.drop_all()
     db.create_all()
