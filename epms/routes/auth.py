@@ -8,7 +8,12 @@ auth = Blueprint("auth", __name__)
 
 @login_manager.user_loader
 def load_user(user_id):
-    return User.query.get(int(user_id))
+    try:
+        return User.query.get(int(user_id))
+    except:
+        print("Couldn't load user")
+        flash("Couldn't load user")
+        return redirect(url_for("auth.login"))
 
 @auth.route("/login")
 def login():
@@ -20,11 +25,12 @@ def login_post():
     password = request.form.get("password")
     remember = True if request.form.get("remember") else False
     user = User.query.filter_by(email=email).first()
+    print(user)
     if not user or not check_password_hash(user.password, password):
         flash("Invalid login credentials")
         return redirect(url_for("auth.login"))
     login_user(user, remember=remember)
-    return redirect(url_for("app.home"))
+    return redirect(url_for("main.display_user"))
 
 @auth.route("/signup", methods=["GET"])
 def signup():

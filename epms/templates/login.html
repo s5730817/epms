@@ -2,8 +2,8 @@
 {% block content %}
 <h1>Login</h1>
 <form method="POST" action="/login">
-    <input type="email" placeholder="email" autofocus="">
-    <input type="password" placeholder="password">
+    <input type="email" name="email" placeholder="email" autofocus="">
+    <input type="password" name="password" placeholder="password">
     <p>Remember me <input type="checkbox" name="remember"></p>
     <button type="submit">Login</button>
 </form>

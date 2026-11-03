@@ -1,7 +1,13 @@
 from epms.extensions import db
 from epms.models import *
+from flask_login import UserMixin
+from epms.extensions import login_manager
 
-class User(db.Model):
+@login_manager.user_loader
+def get_user(id):
+    return User.query.get(int(id))
+
+class User(db.Model, UserMixin):
     tablename = "__users__"
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(128), nullable=False)
