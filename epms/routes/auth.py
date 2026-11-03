@@ -19,6 +19,11 @@ def load_user(user_id):
 def login():
     return render_template("login.html")
 
+@auth.route("/")
+def start():
+    return redirect(url_for("auth.login"))
+
+
 @auth.route("/login", methods=["POST"])
 def login_post():
     email = request.form.get("email")
@@ -30,7 +35,7 @@ def login_post():
         flash("Invalid login credentials")
         return redirect(url_for("auth.login"))
     login_user(user, remember=remember)
-    return redirect(url_for("main.display_user"))
+    return redirect(url_for("main.categories"))
 
 @auth.route("/signup", methods=["GET"])
 def signup():
@@ -60,4 +65,4 @@ def signup_post():
 @login_required
 def logout():
     logout_user()
-    return redirect(url_for("app.home"))
+    return redirect(url_for("auth.login"))
