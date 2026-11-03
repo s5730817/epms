@@ -1,5 +1,6 @@
 from epms.models import Category, Part, User, UserStock
 import random
+from werkzeug.security import generate_password_hash
 
 """
 Database seed file for testing.
@@ -62,7 +63,8 @@ def seed_db(db):
     for name in usernames:
         user = User(
             username=name.lower(),
-            email=f"{name.lower()}@gmail.com",
+            email=f"{name.lower()}@test.com",
+            password=generate_password_hash(password=name.lower())
         )
         db.session.add(user)
         user_objects.append(user)
