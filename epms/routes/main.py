@@ -8,14 +8,17 @@ main_bp = Blueprint("main", __name__)
 def hello():
     return render_template("base.html")
 
+
 @main_bp.route("/categories")
 def categories():
     cats = Category.query.all()
     return render_template("categories.html", categories=cats)
 
+
 @main_bp.route("/categories/<int:cat_id>")
 def category(cat_id):
     return render_template("category.html", category=db.session.get(Category, cat_id))
+
 
 @main_bp.route("/categories/parts/<int:part_id>")
 def check_item(part_id):

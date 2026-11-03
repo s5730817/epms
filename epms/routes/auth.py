@@ -6,7 +6,6 @@ from epms.models import User
 
 auth = Blueprint("auth", __name__)
 
-from epms.models import User
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
@@ -20,16 +19,14 @@ def login_post():
     email = request.form.get("email")
     password = request.form.get("password")
     remember = True if request.form.get("remember") else False
-
     user = User.query.filter_by(email=email).first()
-
     if not user or not check_password_hash(user.password, password):
         flash("Invalid login credentials")
         return redirect(url_for("auth.login"))
     login_user(user, remember=remember)
     return redirect(url_for("app.home"))
 
-@auth.route("/signup")
+@auth.route("/signup", methods=["GET"])
 def signup():
     return render_template("signup.html")
 
@@ -38,16 +35,20 @@ def signup_post():
     email = request.form.get("email")
     username = request.form.get("username")
     password = request.form.get("password")
-
+    print(password)
     user = User.query.filter_by(email=email).first()
     if user:
+        print("Account with this email already exists")
         flash("Account with this email already exists")
         return redirect(url_for("auth.login"))
 
     new_user = User(username=username, email=email, password=generate_password_hash(password=password))
+    print("Account created")
+    print(new_user)
     db.session.add(new_user)
-    db.session.commmit()
+    db.session.commit()
 
+    return redirect(url_for("auth.login"))
 
 @auth.route("/logout")
 @login_required

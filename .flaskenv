@@ -1,1 +1,2 @@
 FLASK_APP = epms
+FLASK_DEBUG = 1
