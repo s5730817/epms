@@ -5,10 +5,13 @@
     </header>
     <body>
         <nav>
+            {%- if not is_logged -%}
             <a href="/login">Login</a>            
             <a href="/signup">Sign up</a>
+            {%- else -%}
             <a href="/logout">Log out</a>
             <a href="/categories">Categories</a>
+            {%- endif -%}
         </nav>
         {% block content %}{% endblock %}
     </body>

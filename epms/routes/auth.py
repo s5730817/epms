@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
-from flask_login import login_user, logout_user, login_required
+from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from epms.extensions import login_manager, db
 from epms.models import User
@@ -14,6 +14,12 @@ def load_user(user_id):
         print("Couldn't load user")
         flash("Couldn't load user")
         return redirect(url_for("auth.login"))
+
+
+@auth.app_context_processor
+def inject_globals():
+    return dict(is_logged=current_user.is_authenticated)
+
 
 @auth.route("/login")
 def login():
@@ -65,4 +71,5 @@ def signup_post():
 @login_required
 def logout():
     logout_user()
+    inject_globals()
     return redirect(url_for("auth.login"))
