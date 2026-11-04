@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% block content %}
 <h1>Categories</h1>
+<a href="/add_part">Add part</a>
 <ul>
     {% for cat in categories %}
     <a href="categories/{{ cat.id }}">{{ cat.name }}</a>

@@ -2,6 +2,6 @@
 {% block content %}
 <h1> {{ category.name }} </h1>
 {% for part in category.parts %}
-    <p>{{ part.name }}</p>
+    <p>{{ part.name }} {{ part.doc_link }}</p>
 {% endfor %}
 {% endblock %}

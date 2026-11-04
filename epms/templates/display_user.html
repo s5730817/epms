@@ -1,8 +1,7 @@
 {% extends "base.html" %}
 {% block content %}
-<h1>{{ user.username }}:{{ user.email }} (user_id: {{ user.id }})</h1>
-<h2>Here's your list:</h2>
+
 {% for part in user_category_parts %}
-    <p>{{ part }}</p>
+    <p>{{ part.name }} {{ part.doc_link }}</p>
 {% endfor %}
 {% endblock %}

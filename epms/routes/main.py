@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template
+from flask import Blueprint, render_template, request, redirect, url_for
 from epms.models import *
 from epms.extensions import db
 from flask_login import current_user, login_required
@@ -32,3 +32,35 @@ def category(cat_id):
 def check_item(part_id):
     part = Part.query.get_or_404(part_id)
     return f"<h1>Checking {part.name}</h1><p>Qty: X</p>"
+
+@main_bp.route("/add_part", methods=["GET"])
+@login_required
+def add_part():
+    categories = db.session.execute(db.select(Category).order_by(Category.name)).scalars()
+    return render_template("add_part.html", categories=categories)
+
+@main_bp.route("/add_part", methods=["POST"])
+@login_required
+def add_part_post():
+    name = request.form.get("name")
+    quantity = request.form.get("quantity")
+    doc_link = request.form.get("doc-link")
+    cat_id = request.form.get("category")
+    part = Part(
+        name=name,
+        doc_link=doc_link,
+        cat_id=cat_id
+    )
+
+    db.session.add(part)
+    db.session.flush()
+
+    stock_entry = UserStock(
+        user_id=current_user.id, 
+        part_id=part.id, 
+        quantity=quantity
+    )
+    print(f"Part {part.id} added by user {current_user.id}, quantity: {stock_entry.quantity}")
+    db.session.add(stock_entry)
+    db.session.commit()
+    return redirect(url_for("main.categories"))

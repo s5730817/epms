@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Add part</h1>
+<form method="POST" action="/add_part">
+    <input type="text" name="name" placeholder="Part name">
+    <input type="number" name="quantity" placeholder="quantity">
+    <p>Documentation link: <input type="url" name="doc-link" placeholder="link"></p>
+    <p>Category: 
+        <select name="category">
+            {% for category in categories %}
+                <option value="{{ category.id }}">{{ category.name }}</p>
+            {% endfor %}
+        </select>
+    </p>
+    <button type="submit">Add</button>
+</form>
+{% endblock %}
