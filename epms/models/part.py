@@ -7,7 +7,7 @@ class Part(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(128), unique=False, nullable=False)
     cat_id = db.Column(db.Integer, ForeignKey("categories.id"), nullable=False)
-    doc_link = db.Column(db.String(256), unique=True, nullable=True)
+    doc_link = db.Column(db.String(256), unique=False, nullable=True)
     category = db.relationship("Category", back_populates="parts")
     stock_entries = db.relationship("UserStock", back_populates="part")
     

@@ -53,6 +53,7 @@ def seed_db(db):
             part = Part(
                 name=f"{category.name} Part {i}",
                 cat_id=category.id,
+                doc_link=f"http://test.com/{i}"
             )
             db.session.add(part)
             part_objects.append(part)

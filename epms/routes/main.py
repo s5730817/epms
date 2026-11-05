@@ -23,7 +23,22 @@ def categories():
 @login_required
 def category(cat_id):
     user = User.query.get_or_404(current_user.id)
-    user_category_parts = Part.query.filter(Part.id.in_([stock_item.part_id for stock_item in UserStock.query.filter_by(user_id=current_user.id).all()])).filter_by(cat_id=cat_id).all()    
+    user_category_parts_query = (
+        db.select(Part, UserStock.quantity)
+        .join(UserStock, UserStock.part_id == Part.id)
+        .where(UserStock.user_id == current_user.id, Part.cat_id == cat_id)
+    )
+
+    user_category_parts = db.session.execute(user_category_parts_query).all()
+    print(user_category_parts)
+    """Part.query.filter(
+        Part.id.in_(
+            [stock_item.part_id for stock_item in UserStock.query.filter_by(
+                    user_id=current_user.id
+                ).all()
+            ]
+            )
+        ).filter_by(cat_id=cat_id).all()"""    
     return render_template("display_user.html", user=user, user_category_parts=user_category_parts)
     
 
@@ -37,6 +52,8 @@ def check_item(part_id):
 @login_required
 def add_part():
     categories = db.session.execute(db.select(Category).order_by(Category.name)).scalars()
+    # This is to check if part with same name already exists
+    """parts = db.session.execute(db.select(Part.name)).scalars()"""
     return render_template("add_part.html", categories=categories)
 
 @main_bp.route("/add_part", methods=["POST"])

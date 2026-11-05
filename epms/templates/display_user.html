@@ -1,7 +1,17 @@
 {% extends "base.html" %}
 {% block content %}
-
-{% for part in user_category_parts %}
-    <p>{{ part.name }} {{ part.doc_link }}</p>
+<table border="5">
+    <tr>
+        <th>Name</th>
+        <th>Qtt</th>
+        <th>Doc lnk</th>
+    </tr>
+{% for part, quantity in user_category_parts %}
+    <tr>
+        <td>{{ part.name }}</td>
+        <td>{{ quantity }}</td>
+        <td><a href="{{ part.doc_link }}">{{ part.doc_link }}</a></td> 
+    </tr>
 {% endfor %}
+</table>
 {% endblock %}
