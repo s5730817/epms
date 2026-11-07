@@ -29,24 +29,30 @@ def category(cat_id):
         .where(UserStock.user_id == current_user.id, Part.cat_id == cat_id)
     )
 
-    user_category_parts = db.session.execute(user_category_parts_query).all()
-    print(user_category_parts)
-    """Part.query.filter(
-        Part.id.in_(
-            [stock_item.part_id for stock_item in UserStock.query.filter_by(
-                    user_id=current_user.id
-                ).all()
-            ]
-            )
-        ).filter_by(cat_id=cat_id).all()"""    
+    user_category_parts = db.session.execute(user_category_parts_query).all()    
     return render_template("display_user.html", user=user, user_category_parts=user_category_parts)
     
 
-@main_bp.route("/categories/parts/<int:part_id>")
+@main_bp.route("/categories/part/<int:part_id>")
 @login_required
 def check_item(part_id):
-    part = Part.query.get_or_404(part_id)
-    return f"<h1>Checking {part.name}</h1><p>Qty: X</p>"
+
+    part_query = (
+            db.select(Part.id, Part.name, Part.doc_link, UserStock.quantity)
+            .join(UserStock, UserStock.part_id == Part.id)
+            .where(UserStock.user_id == current_user.id, Part.id == part_id)
+        )
+    part = db.session.execute(part_query).first()
+    return render_template("part.html", part=part)
+
+@main_bp.route("/change_qtt", methods=["POST"])
+def change_qtt():
+    new_qtt = int(request.form.get("new_qtt"))
+    part_id = int(request.form.get("part_id"))
+    entry = db.session.get(UserStock, (current_user.id, part_id))
+    entry.quantity = new_qtt
+    db.session.commit()
+    return redirect(url_for("main.check_item", part_id=part_id))
 
 @main_bp.route("/add_part", methods=["GET"])
 @login_required

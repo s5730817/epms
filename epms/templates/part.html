@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>{{ part.name }}</h1>
+<p>Qtt: {{ part.quantity }}</p>
+<p>
+    Change qtt: 
+    <form method="POST" action="/change_qtt">
+        <input type="number" name="new_qtt">
+        <input hidden name="part_id" type="number" value="{{ part.id }}">
+        <button type="submit">C</button>
+    </form>
+</p>
+<p>Documentation: {{ part.doc_link }}</p>
+{% endblock %}
