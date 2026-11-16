@@ -107,11 +107,14 @@ def parse_doc():
 def upload_datasheet():
     UPLOAD_FOLDER = os.path.join(os.path.dirname(os.path.abspath(__file__)), "uploads")
     os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+    print(UPLOAD_FOLDER)
 
     file = request.files.get("part_datasheet")
     if file and file.filename:
         filename = secure_filename(file.filename)
-        file.save(os.path.join(UPLOAD_FOLDER, secure_filename(file.filename)))   
-    with pdfplumber.open(filename) as pdf:
-        check_pdf_type(pdf)
+        filepath = os.path.join(UPLOAD_FOLDER, secure_filename(file.filename))
+        file.save(filepath)
+    with pdfplumber.open(filepath) as pdf:
+        print(check_pdf_type(pdf))
+        print(extract_text(pdf))
     return redirect(url_for("main.parse_doc"))
