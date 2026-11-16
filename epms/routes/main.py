@@ -2,6 +2,7 @@ from flask import Blueprint, render_template, request, redirect, url_for
 from epms.models import *
 from epms.extensions import db
 from epms.modules.pdf_extract import *
+from epms.modules.llm_parse import *
 from flask_login import current_user, login_required
 from werkzeug.utils import secure_filename
 import os
@@ -111,10 +112,12 @@ def upload_datasheet():
 
     file = request.files.get("part_datasheet")
     if file and file.filename:
-        filename = secure_filename(file.filename)
         filepath = os.path.join(UPLOAD_FOLDER, secure_filename(file.filename))
         file.save(filepath)
     with pdfplumber.open(filepath) as pdf:
         print(check_pdf_type(pdf))
-        print(extract_text(pdf))
+        text = extract_text(pdf)
+        print(text[0]["text"])
+        for i in range(len(text)):
+            print(parse_datasheet(text[i]["text"]))
     return redirect(url_for("main.parse_doc"))
