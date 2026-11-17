@@ -3,7 +3,6 @@ from flask import jsonify
 from werkzeug.utils import secure_filename
 import os
 
-
 WEIGHTS_FOLDER = os.path.join(os.path.dirname(os.path.abspath(__file__)), "weights")
 WEIGHTS_FILE = "Qwen2.5-7B-Instruct-Q3_K_M.gguf"
 weight_path = os.path.join(WEIGHTS_FOLDER, secure_filename(WEIGHTS_FILE))
