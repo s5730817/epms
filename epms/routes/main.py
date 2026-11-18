@@ -1,9 +1,14 @@
 from flask import Blueprint, render_template, request, redirect, url_for
 from epms.models import *
 from epms.extensions import db
+from epms.modules.pdf_extract import *
+from epms.modules.llm_parse import *
 from flask_login import current_user, login_required
+from werkzeug.utils import secure_filename
+import os
 
 main_bp = Blueprint("main", __name__)
+
 
 """
 @main_bp.route("/")
@@ -45,6 +50,7 @@ def check_item(part_id):
     part = db.session.execute(part_query).first()
     return render_template("part.html", part=part)
 
+
 @main_bp.route("/change_qtt", methods=["POST"])
 def change_qtt():
     new_qtt = int(request.form.get("new_qtt"))
@@ -54,6 +60,7 @@ def change_qtt():
     db.session.commit()
     return redirect(url_for("main.check_item", part_id=part_id))
 
+
 @main_bp.route("/add_part", methods=["GET"])
 @login_required
 def add_part():
@@ -61,6 +68,7 @@ def add_part():
     # This is to check if part with same name already exists
     """parts = db.session.execute(db.select(Part.name)).scalars()"""
     return render_template("add_part.html", categories=categories)
+
 
 @main_bp.route("/add_part", methods=["POST"])
 @login_required
@@ -87,3 +95,29 @@ def add_part_post():
     db.session.add(stock_entry)
     db.session.commit()
     return redirect(url_for("main.categories"))
+
+
+@main_bp.route("/parse", methods=["GET"])
+@login_required
+def parse_doc():
+    return render_template("parse.html")
+
+
+@main_bp.route("/upload_datasheet", methods=["POST"])
+@login_required
+def upload_datasheet():
+    UPLOAD_FOLDER = os.path.join(os.path.dirname(os.path.abspath(__file__)), "uploads")
+    os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+    print(UPLOAD_FOLDER)
+
+    file = request.files.get("part_datasheet")
+    if file and file.filename:
+        filepath = os.path.join(UPLOAD_FOLDER, secure_filename(file.filename))
+        file.save(filepath)
+    with pdfplumber.open(filepath) as pdf:
+        print(check_pdf_type(pdf))
+        text = extract_text(pdf)
+        print(text[0]["text"])
+        for i in range(len(text)):
+            print(parse_datasheet(text[i]["text"]))
+    return redirect(url_for("main.parse_doc"))
