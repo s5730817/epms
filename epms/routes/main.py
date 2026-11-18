@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for
 from epms.models import *
-from epms.extensions import db
+from epms.extensions import db, mongo_cluster
 from epms.modules.pdf_extract import *
 from epms.modules.llm_parse import *
 from flask_login import current_user, login_required
@@ -8,7 +8,8 @@ from werkzeug.utils import secure_filename
 import os
 
 main_bp = Blueprint("main", __name__)
-
+mongo_db = mongo_cluster["epms"]
+collection = mongo_db["parts"]
 
 """
 @main_bp.route("/")
@@ -121,3 +122,4 @@ def upload_datasheet():
         for i in range(len(text)):
             print(parse_datasheet(text[i]["text"]))
     return redirect(url_for("main.parse_doc"))
+

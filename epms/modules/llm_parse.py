@@ -12,7 +12,8 @@ llm = Llama(
     model_path=weight_path,
     n_ctx=8192,
     n_threads=8,
-    n_gpu_layers=0
+    n_gpu_layers=0,
+    verbose=False
 )
 
 SYSTEM_PROMPT = """You are an expert in electronic components.
