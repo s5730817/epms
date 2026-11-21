@@ -9,6 +9,11 @@
         <input hidden name="part_id" type="number" value="{{ part.id }}">
         <button type="submit">C</button>
     </form>
-</p>
+
+    <h2>Upload datasheet</h2>
+        <form enctype="multipart/form-data" method="POST" action="{{ url_for('main.upload_datasheet', part_id = part.id) }}">
+            <input type="file" name="part_datasheet" accept=".pdf">
+            <input type="submit">
+        </form>
 <p>Documentation: {{ part.doc_link }}</p>
 {% endblock %}

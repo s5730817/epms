@@ -1,14 +1,15 @@
 from flask import Blueprint, render_template, request, redirect, url_for
 from epms.models import *
-from epms.extensions import db, mongo_cluster
+from epms.extensions import db, mongo_client
 from epms.modules.pdf_extract import *
 from epms.modules.llm_parse import *
 from flask_login import current_user, login_required
 from werkzeug.utils import secure_filename
 import os
+import json
 
 main_bp = Blueprint("main", __name__)
-mongo_db = mongo_cluster["epms"]
+mongo_db = mongo_client["epms"]
 collection = mongo_db["parts"]
 
 """
@@ -98,19 +99,11 @@ def add_part_post():
     return redirect(url_for("main.categories"))
 
 
-@main_bp.route("/parse", methods=["GET"])
-@login_required
-def parse_doc():
-    return render_template("parse.html")
-
-
 @main_bp.route("/upload_datasheet", methods=["POST"])
 @login_required
 def upload_datasheet():
     UPLOAD_FOLDER = os.path.join(os.path.dirname(os.path.abspath(__file__)), "uploads")
     os.makedirs(UPLOAD_FOLDER, exist_ok=True)
-    print(UPLOAD_FOLDER)
-
     file = request.files.get("part_datasheet")
     if file and file.filename:
         filepath = os.path.join(UPLOAD_FOLDER, secure_filename(file.filename))
@@ -118,8 +111,22 @@ def upload_datasheet():
     with pdfplumber.open(filepath) as pdf:
         print(check_pdf_type(pdf))
         text = extract_text(pdf)
-        print(text[0]["text"])
-        for i in range(len(text)):
-            print(parse_datasheet(text[i]["text"]))
-    return redirect(url_for("main.parse_doc"))
+        data = ""
+        for page in text:
+            data += page["text"]
+        part_datasheet = parse_datasheet(data)
+
+        part_id = request.args.get("part_id", None)
+        try:
+            part_id = int(part_id)
+        except:
+            print("Something aint right bro")
+
+        part_data = {
+            "part_id": part_id,
+            "data": part_datasheet  
+        }
+        collection.insert_one(part_data)
+        
+    return redirect(url_for("main.categories"))
 

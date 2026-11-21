@@ -2,7 +2,7 @@ from llama_cpp import Llama
 from flask import jsonify
 from werkzeug.utils import secure_filename
 import os
-
+import json
 
 WEIGHTS_FOLDER = os.path.join(os.path.dirname(os.path.abspath(__file__)), "weights")
 WEIGHTS_FILE = "Qwen2.5-7B-Instruct-Q3_K_M.gguf"
@@ -27,6 +27,13 @@ If the datasheet does not include this information - only return what you could 
 You must only retrieve essential information, text only (no diagrams/tables)
 Return as JSON only."""
 
+def safe_parse(raw: str) -> dict:
+    text = raw.strip()
+    if text.startswith("```"):
+        text = text.split("```json", 2)[1].rsplit("```", 1)[0]
+    
+    return text.strip()
+
 def parse_datasheet(datasheet):
     messages = [
         {"role": "system", "content": SYSTEM_PROMPT},
@@ -38,5 +45,6 @@ def parse_datasheet(datasheet):
         temperature=0.0,   # deterministic extraction
         stop=["</s>"]
     )
-    print(output["choices"][0]["message"]["content"])
-    return jsonify({"result": output["choices"][0]["message"]["content"]})
+    result = safe_parse(output["choices"][0]["message"]["content"])
+    
+    return result

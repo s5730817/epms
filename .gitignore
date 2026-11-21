@@ -4,3 +4,5 @@ idea.txt
 __pycache__
 instance/event_database.db
 epms/modules/weights/Qwen2.5-7B-Instruct-Q3_K_M.gguf
+epms/routes/uploads
+instance/event_database.db
