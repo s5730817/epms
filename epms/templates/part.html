@@ -11,10 +11,18 @@
     </form>
 
     <h2>Upload datasheet</h2>
+        {%- if part_data is none -%}
+        <p>No extracted data yet...</p>
         <form enctype="multipart/form-data" method="POST" action="{{ url_for('main.upload_datasheet', part_id = part.id) }}">
             <input type="file" name="part_datasheet" accept=".pdf">
             <input type="submit">
         </form>
+        {%- else -%}
+        <form enctype="multipart/form-data" method="POST" action="{{ url_for('main.update_datasheet', part_id = part.id) }}">
+            <input type="file" name="part_datasheet" accept=".pdf">
+            <input type="submit" value="Update">
+        </form>
+        {%- endif -%}
 <p>Documentation: {{ part.doc_link }}</p>
 <h2>Part data extracted</h2>
 {{ part_data }}

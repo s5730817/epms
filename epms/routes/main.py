@@ -49,7 +49,8 @@ def check_item(part_id):
             .join(UserStock, UserStock.part_id == Part.id)
             .where(UserStock.user_id == current_user.id, Part.id == part_id)
         )
-    part_data = collection.find_one({"part_id": {"$eq": part_id}})["data"]
+    part_data_file = collection.find_one({"part_id": {"$eq": part_id}})
+    part_data = part_data_file["data"] if part_data_file is not None else None
     part = db.session.execute(part_query).first()
     return render_template("part.html", part=part, part_data=part_data)
 
@@ -97,6 +98,41 @@ def add_part_post():
     print(f"Part {part.id} added by user {current_user.id}, quantity: {stock_entry.quantity}")
     db.session.add(stock_entry)
     db.session.commit()
+    return redirect(url_for("main.categories"))
+
+
+@main_bp.route("/update_datasheet", methods=["POST"])
+@login_required
+def update_datasheet():
+    UPLOAD_FOLDER = os.path.join(os.path.dirname(os.path.abspath(__file__)), "uploads")
+    os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+    file = request.files.get("part_datasheet")
+    if file and file.filename:
+        filepath = os.path.join(UPLOAD_FOLDER, secure_filename(file.filename))
+        file.save(filepath)
+    with pdfplumber.open(filepath) as pdf:
+        print(check_pdf_type(pdf))
+        text = extract_text(pdf)
+        data = ""
+        for page in text:
+            data += page["text"]
+        part_datasheet = parse_datasheet(data)
+
+        part_id = request.args.get("part_id", None)
+        try:
+            part_id = int(part_id)
+        except:
+            print("Something aint right bro")
+
+        part_data = {
+            "part_id": part_id,
+            "data": part_datasheet  
+        }
+
+        query_filter = {"part_id": part_id}
+        update_operation = {"$set": {"data":part_data}}
+        collection.update_one(query_filter, update_operation)
+        
     return redirect(url_for("main.categories"))
 
 
