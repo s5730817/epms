@@ -49,8 +49,9 @@ def check_item(part_id):
             .join(UserStock, UserStock.part_id == Part.id)
             .where(UserStock.user_id == current_user.id, Part.id == part_id)
         )
+    part_data = collection.find_one({"part_id": {"$eq": part_id}})["data"]
     part = db.session.execute(part_query).first()
-    return render_template("part.html", part=part)
+    return render_template("part.html", part=part, part_data=part_data)
 
 
 @main_bp.route("/change_qtt", methods=["POST"])
