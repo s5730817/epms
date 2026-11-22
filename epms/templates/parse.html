@@ -1,8 +1,0 @@
-{% extends "base.html" %}
-{% block content %}
-<h1>Upload file</h1>
-<form enctype="multipart/form-data" method="POST" action="/upload_datasheet">
-    <input type="file" name="part_datasheet" accept=".pdf">
-    <input type="submit">
-</form>
-{% endblock %}
