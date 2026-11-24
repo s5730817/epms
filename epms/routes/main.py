@@ -21,14 +21,14 @@ def hello():
 
 @main_bp.route("/categories")
 @login_required
-def categories():
+def get_categories():
     cats = Category.query.all()
     return render_template("categories.html", categories=cats)
 
 
 @main_bp.route("/categories/<int:cat_id>")
 @login_required
-def category(cat_id):
+def get_category(cat_id):
     user = User.query.get_or_404(current_user.id)
     user_category_parts_query = (
         db.select(Part, UserStock.quantity)
@@ -42,7 +42,7 @@ def category(cat_id):
 
 @main_bp.route("/categories/part/<int:part_id>")
 @login_required
-def check_item(part_id):
+def get_item(part_id):
 
     part_query = (
             db.select(Part.id, Part.name, Part.doc_link, UserStock.quantity)
@@ -51,18 +51,20 @@ def check_item(part_id):
         )
     part_data_file = collection.find_one({"part_id": {"$eq": part_id}})
     part_data = part_data_file["data"] if part_data_file is not None else None
+    part_data_json = json.loads(part_data)    
     part = db.session.execute(part_query).first()
-    return render_template("part.html", part=part, part_data=part_data)
+
+    return render_template("part.html", part=part, part_data=part_data_json)
 
 
 @main_bp.route("/change_qtt", methods=["POST"])
-def change_qtt():
+def update_part_qtt():
     new_qtt = int(request.form.get("new_qtt"))
     part_id = int(request.form.get("part_id"))
     entry = db.session.get(UserStock, (current_user.id, part_id))
     entry.quantity = new_qtt
     db.session.commit()
-    return redirect(url_for("main.check_item", part_id=part_id))
+    return redirect(url_for("main.get_item", part_id=part_id))
 
 
 @main_bp.route("/add_part", methods=["GET"])
