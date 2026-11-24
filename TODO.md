@@ -3,7 +3,7 @@
 [+] - Print json data in a table 
     [] - Need to look into nested data
 [+] - Add part documentation link update
-[] - Refactor Jinja template 
+[] - Refactor Jinja template for part
 [] - Fetch documentation from link provided
 [] - Change part interface
 [] - Check if someone can change part documentation even if part doesn't belong to them
@@ -14,7 +14,7 @@
     [] - Make sure documentation is removed/kept after parsing
 [+] - Get rid of duplicate functionality between datasheet upload and update routes...
 [] - Check/validate frontend field inputs
-[] - Disable upload/update button while on-load
+[] - Disable upload/update button while on-load/ if no file present
 
 [] - Action logging?
 [] - Add google and microsoft authentication

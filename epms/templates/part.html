@@ -9,20 +9,22 @@
         <button type="submit">C</button>
     </form>
 
+
+    {%- if part_data is none -%}
+        {%- set action = url_for('main.upload_datasheet', part_id = part.id) -%}
+        {%- set label = "Upload" -%}
+    {%- else -%}
+        {%- set action = url_for('main.update_datasheet', part_id = part.id) -%}
+        {%- set label = "Update" -%}
+    {%- endif -%}
+
     <h2>Upload datasheet</h2>
-        {%- if part_data is none -%}
-        <p>No extracted data yet...</p>
-        <form enctype="multipart/form-data" method="POST" action="{{ url_for('main.upload_datasheet', part_id = part.id) }}">
-            <input type="file" name="part_datasheet" accept=".pdf">z
-            <input type="submit">
-        </form>
-        {%- else -%}
-        <form enctype="multipart/form-data" method="POST" action="{{ url_for('main.update_datasheet', part_id = part.id) }}">
-            <input type="file" name="part_datasheet" accept=".pdf">
-            <input type="submit" value="Update">
-        </form>
+    <form enctype="multipart/form-data" method="POST" action="{{ action }}">
+        <input type="file" name="part_datasheet" accept=".pdf">
+        <input type="submit" value="{{ label }}">
         <p>Keep file?</p><input type="checkbox" name="file_keep">
-        {%- endif -%}
+    </form>
+
 <p>Documentation: {{ part.doc_link }}</p>
 <form method="POST" action="{{ url_for('main.update_part_link', part_id = part.id) }}">
     <p>Update doc link:</p>
