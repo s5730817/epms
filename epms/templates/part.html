@@ -13,7 +13,7 @@
         {%- if part_data is none -%}
         <p>No extracted data yet...</p>
         <form enctype="multipart/form-data" method="POST" action="{{ url_for('main.upload_datasheet', part_id = part.id) }}">
-            <input type="file" name="part_datasheet" accept=".pdf">
+            <input type="file" name="part_datasheet" accept=".pdf">z
             <input type="submit">
         </form>
         {%- else -%}
@@ -21,6 +21,7 @@
             <input type="file" name="part_datasheet" accept=".pdf">
             <input type="submit" value="Update">
         </form>
+        <p>Keep file?</p><input type="checkbox" name="file_keep">
         {%- endif -%}
 <p>Documentation: {{ part.doc_link }}</p>
 <form method="POST" action="{{ url_for('main.update_part_link', part_id = part.id) }}">
@@ -29,6 +30,7 @@
     <button type="submit">Update</button>
 </form>
 <h2>Part data extracted</h2>
+{% if part_data != None %}
 <table border="5">
     <tr>
         <th>Key</th>
@@ -42,5 +44,8 @@
     {% endfor %}
     
 </table>
+{% else %}
+<p>No data yet...</p>
+{% endif %}
 
 {% endblock %}

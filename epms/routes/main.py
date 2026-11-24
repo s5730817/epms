@@ -143,6 +143,16 @@ def save_file(file):
 
     return filepath    
 
+def remove_file(filepath):
+    try:
+        os.remove(filepath)
+        print(f"File '{filepath}' deleted successfully.")
+    except FileNotFoundError:
+        print(f"File '{filepath}' does not exist.")
+    except OSError as e:
+        print(f"Error deleting file: {e}")
+
+
 @main_bp.route("/update_datasheet", methods=["POST"])
 @login_required
 def update_datasheet():
@@ -150,6 +160,7 @@ def update_datasheet():
     filepath = save_file(file)
     part_id = int(request.args.get("part_id", None))
     part_data = compile_part_data(part_id, filepath)
+    remove_file(filepath)
     query_filter = {"part_id": part_id}
     update_operation = {"$set": {"data": part_data}}
     collection.update_one(query_filter, update_operation)
@@ -164,6 +175,7 @@ def upload_datasheet():
     part_id = int(request.args.get("part_id", None))
     filepath = save_file(file)
     part_data = compile_part_data(part_id, filepath)
+    remove_file(filepath)
     collection.insert_one(part_data)
     return redirect(url_for("main.get_categories"))
 
