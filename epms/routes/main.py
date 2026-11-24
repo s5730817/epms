@@ -51,9 +51,9 @@ def get_item(part_id):
         )
     part_data_file = collection.find_one({"part_id": {"$eq": part_id}})
     part_data = part_data_file["data"] if part_data_file is not None else None
-    part_data_json = json.loads(part_data)    
     part = db.session.execute(part_query).first()
-
+    part_data_json = json.loads(part_data) if part_data else None
+    
     return render_template("part.html", part=part, part_data=part_data_json)
 
 
@@ -75,7 +75,7 @@ def validate_link(link):
 @main_bp.route("/update_part_link", methods=["POST"])
 def update_part_link():
     new_link = request.form.get("new_link")
-    part_id = request.args.get("part_id")
+    part_id = int(request.args.get("part_id"))
     print(validate_link(new_link))
     entry = db.session.get(Part, part_id)
     entry.doc_link = new_link
@@ -120,69 +120,50 @@ def add_part_post():
     return redirect(url_for("main.get_categories"))
 
 
-@main_bp.route("/update_datasheet", methods=["POST"])
-@login_required
-def update_datasheet():
-    UPLOAD_FOLDER = os.path.join(os.path.dirname(os.path.abspath(__file__)), "uploads")
-    os.makedirs(UPLOAD_FOLDER, exist_ok=True)
-    file = request.files.get("part_datasheet")
-    if file and file.filename:
-        filepath = os.path.join(UPLOAD_FOLDER, secure_filename(file.filename))
-        file.save(filepath)
+def compile_part_data(part_id, filepath):
     with pdfplumber.open(filepath) as pdf:
-        print(check_pdf_type(pdf))
         text = extract_text(pdf)
         data = ""
         for page in text:
             data += page["text"]
-        part_datasheet = parse_datasheet(data)
-
-        part_id = request.args.get("part_id", None)
+        part_data = parse_datasheet(data)
         try:
             part_id = int(part_id)
         except:
             print("Something aint right bro")
 
-        part_data = {
-            "part_id": part_id,
-            "data": part_datasheet  
-        }
+        return part_data
 
-        query_filter = {"part_id": part_id}
-        update_operation = {"$set": {"data":part_data}}
-        collection.update_one(query_filter, update_operation)
-        
+def save_file(file):
+    UPLOAD_FOLDER = os.path.join(os.path.dirname(os.path.abspath(__file__)), "uploads")
+    os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+    if file and file.filename:
+        filepath = os.path.join(UPLOAD_FOLDER, secure_filename(file.filename))
+        file.save(filepath)
+
+    return filepath    
+
+@main_bp.route("/update_datasheet", methods=["POST"])
+@login_required
+def update_datasheet():
+    file = request.files.get("part_datasheet")
+    filepath = save_file(file)
+    part_id = int(request.args.get("part_id", None))
+    part_data = compile_part_data(part_id, filepath)
+    query_filter = {"part_id": part_id}
+    update_operation = {"$set": {"data": part_data}}
+    collection.update_one(query_filter, update_operation)
+
     return redirect(url_for("main.get_categories"))
 
 
 @main_bp.route("/upload_datasheet", methods=["POST"])
 @login_required
 def upload_datasheet():
-    UPLOAD_FOLDER = os.path.join(os.path.dirname(os.path.abspath(__file__)), "uploads")
-    os.makedirs(UPLOAD_FOLDER, exist_ok=True)
     file = request.files.get("part_datasheet")
-    if file and file.filename:
-        filepath = os.path.join(UPLOAD_FOLDER, secure_filename(file.filename))
-        file.save(filepath)
-    with pdfplumber.open(filepath) as pdf:
-        print(check_pdf_type(pdf))
-        text = extract_text(pdf)
-        data = ""
-        for page in text:
-            data += page["text"]
-        part_datasheet = parse_datasheet(data)
-
-        part_id = request.args.get("part_id", None)
-        try:
-            part_id = int(part_id)
-        except:
-            print("Something aint right bro")
-
-        part_data = {
-            "part_id": part_id,
-            "data": part_datasheet  
-        }
-        collection.insert_one(part_data)
-        
-    return redirect(url_for("main.categories"))
+    part_id = int(request.args.get("part_id", None))
+    filepath = save_file(file)
+    part_data = compile_part_data(part_id, filepath)
+    collection.insert_one(part_data)
+    return redirect(url_for("main.get_categories"))
 
