@@ -41,7 +41,7 @@ def login_post():
         flash("Invalid login credentials")
         return redirect(url_for("auth.login"))
     login_user(user, remember=remember)
-    return redirect(url_for("main.categories"))
+    return redirect(url_for("main.get_categories"))
 
 @auth.route("/signup", methods=["GET"])
 def signup():
