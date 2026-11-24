@@ -25,5 +25,18 @@
         {%- endif -%}
 <p>Documentation: {{ part.doc_link }}</p>
 <h2>Part data extracted</h2>
-{{ part_data }}
+<table border="5">
+    <tr>
+        <th>Key</th>
+        <th>Value</th>
+    </tr>
+    {% for key in part_data %}
+        <tr>
+            <th>{{ key }}</th>
+            <th>{{ part_data[key] }}</th>
+        </tr>
+    {% endfor %}
+    
+</table>
+
 {% endblock %}
