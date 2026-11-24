@@ -57,13 +57,30 @@ def get_item(part_id):
     return render_template("part.html", part=part, part_data=part_data_json)
 
 
-@main_bp.route("/change_qtt", methods=["POST"])
+@main_bp.route("/update_part_qtt", methods=["POST"])
 def update_part_qtt():
     new_qtt = int(request.form.get("new_qtt"))
-    part_id = int(request.form.get("part_id"))
+    part_id = int(request.args.get("part_id"))
     entry = db.session.get(UserStock, (current_user.id, part_id))
     entry.quantity = new_qtt
     db.session.commit()
+    return redirect(url_for("main.get_item", part_id=part_id))
+
+
+# Function to validate if the doc link is legit
+def validate_link(link):
+    return not link==""
+
+
+@main_bp.route("/update_part_link", methods=["POST"])
+def update_part_link():
+    new_link = request.form.get("new_link")
+    part_id = request.args.get("part_id")
+    print(validate_link(new_link))
+    entry = db.session.get(Part, part_id)
+    entry.doc_link = new_link
+    db.session.commit()
+    print("Link updated")
     return redirect(url_for("main.get_item", part_id=part_id))
 
 
@@ -100,7 +117,7 @@ def add_part_post():
     print(f"Part {part.id} added by user {current_user.id}, quantity: {stock_entry.quantity}")
     db.session.add(stock_entry)
     db.session.commit()
-    return redirect(url_for("main.categories"))
+    return redirect(url_for("main.get_categories"))
 
 
 @main_bp.route("/update_datasheet", methods=["POST"])
@@ -135,7 +152,7 @@ def update_datasheet():
         update_operation = {"$set": {"data":part_data}}
         collection.update_one(query_filter, update_operation)
         
-    return redirect(url_for("main.categories"))
+    return redirect(url_for("main.get_categories"))
 
 
 @main_bp.route("/upload_datasheet", methods=["POST"])

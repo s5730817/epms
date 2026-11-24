@@ -2,11 +2,10 @@
 {% block content %}
 <h1>{{ part.name }}</h1>
 <p>Qtt: {{ part.quantity }}</p>
-<p>
-    Change qtt: 
-    <form method="POST" action="/change_qtt">
+ 
+    <form method="POST" action="{{ url_for('main.update_part_qtt', part_id = part.id) }}">
+        <p>Change qtt:</p>
         <input type="number" name="new_qtt">
-        <input hidden name="part_id" type="number" value="{{ part.id }}">
         <button type="submit">C</button>
     </form>
 
@@ -24,6 +23,11 @@
         </form>
         {%- endif -%}
 <p>Documentation: {{ part.doc_link }}</p>
+<form method="POST" action="{{ url_for('main.update_part_link', part_id = part.id) }}">
+    <p>Update doc link:</p>
+    <input type="url" name="new_link">
+    <button type="submit">Update</button>
+</form>
 <h2>Part data extracted</h2>
 <table border="5">
     <tr>
